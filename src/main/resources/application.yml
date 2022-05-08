@@ -1,0 +1,17 @@
+spring:
+  profiles.active: default,local
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: "Google clientId"
+            clientSecret: "Google clientSecret"
+            scope:
+              - "https://www.googleapis.com/auth/gmail.readonly"
+              - "https://www.googleapis.com/auth/userinfo.email"
+
+bot:
+  token: "token"
+
+logging.level.io.gnupinguin.camblybot.clients.GmailClient: DEBUG
