@@ -23,7 +23,6 @@ class GmailFeignClientConfiguration {
     private val objectMapper = ObjectMapper().registerModule(KotlinModule())
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-
     @Bean
     private fun feignLoggerLevel(): Logger.Level {
         return Logger.Level.FULL

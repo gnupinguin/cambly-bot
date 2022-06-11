@@ -7,11 +7,16 @@ spring:
           google:
             clientId: "Google clientId"
             clientSecret: "Google clientSecret"
+            authorization-grant-type: authorization_code
             scope:
               - "https://www.googleapis.com/auth/gmail.readonly"
               - "https://www.googleapis.com/auth/userinfo.email"
 
 bot:
   token: "token"
+
+security:
+  rsaJwkKey: "rsa jwk"
+  ttl: 60
 
 logging.level.io.gnupinguin.camblybot.clients.GmailClient: DEBUG

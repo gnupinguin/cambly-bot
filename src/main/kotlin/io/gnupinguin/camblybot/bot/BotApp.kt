@@ -9,8 +9,8 @@ import com.github.kotlintelegrambot.entities.Message
 import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.network.Response
 import com.github.kotlintelegrambot.network.fold
-import io.gnupinguin.camblybot.authorization.AuthorizationStorage
-import io.gnupinguin.camblybot.authorization.UserCodeGenerator
+import io.gnupinguin.camblybot.authorization.session.UserSessionProvider
+import io.gnupinguin.camblybot.persistance.Lesson
 import io.gnupinguin.camblybot.persistance.UserRepository
 import io.gnupinguin.camblybot.service.LessonProvider
 import org.slf4j.LoggerFactory
@@ -20,8 +20,7 @@ import javax.annotation.PostConstruct
 @Component
 class BotApp(private val configuration: BotConfiguration,
              private val userRepository: UserRepository,
-             private val authRepository: AuthorizationStorage,
-             private val userCodeGenerator: UserCodeGenerator,
+             private val userSessionProvider: UserSessionProvider,
              private val lessonProvider: LessonProvider) {
 
     companion object {
@@ -35,9 +34,8 @@ class BotApp(private val configuration: BotConfiguration,
             command("authorize") {
                 val user = userRepository.getUser(message.chat.id)
                 if (user == null) {
-                    val code = userCodeGenerator.generate()
-                    authRepository.register(message.chat.id, code)
-                    sendHtml("http://127.0.0.1:8080?userCode=$code")
+                    val sessionId = userSessionProvider.generate(message.chat.id)
+                    sendHtml("http://127.0.0.1:8080/oauth2/authorization/google?jwt=$sessionId")
                 }
             }
             command("lastLesson") {
@@ -46,17 +44,18 @@ class BotApp(private val configuration: BotConfiguration,
                     bot.sendMessage(chatId = chatId(), text = "Please, call /authorize first")
                 } else {
                     lessonProvider.getCamblyLessonSummary(user, 1).forEach { lesson ->
-                        val text = "Teacher: ${lesson.teacher} \n" +
-                                "Date: ${lesson.date} \n" +
-                                "Duration: ${lesson.duration}m \n" +
-                                "Phrases: \n" +
-                                lesson.words.map { "<b>$it</b>" }.joinToString(separator = "\n")
-                        sendHtml(text)
+                        sendHtml(getSummary(lesson))
                     }
                 }
             }
         }
     }
+
+    private fun getSummary(lesson: Lesson) = "Teacher: ${lesson.teacher} \n" +
+            "Date: ${lesson.date} \n" +
+            "Duration: ${lesson.duration}m \n" +
+            "Phrases: \n" +
+            lesson.words.joinToString(separator = "\n") { "<b>$it</b>" }
 
     private fun CommandHandlerEnvironment.sendHtml(text: String, responseHandler: (Response<Message>?) -> Unit = {}) {
         bot.sendMessage(chatId = chatId(), text = text, ParseMode.HTML ).fold(responseHandler) {

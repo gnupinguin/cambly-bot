@@ -15,3 +15,4 @@ class CamblyBotApplication
 fun main(args: Array<String>) {
     runApplication<CamblyBotApplication>(*args)
 }
+

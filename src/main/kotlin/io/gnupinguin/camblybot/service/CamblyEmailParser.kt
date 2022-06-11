@@ -24,8 +24,8 @@ class CamblyEmailParserImpl: CamblyEmailParser {
         private val chatRegex = Regex(
             "Lesson with (?<teacher>.+?)\\s+\r\n" +
                     "(?<date>.+?\\((?<timezone>.*?)\\))" +
-                    ", duration (?<duration>\\d+) minutes.*?Chat Summary:\\s+" +
-                    "(?<chat>.*?)\r\n\r\n\r\n", setOf(RegexOption.MULTILINE, RegexOption.DOT_MATCHES_ALL))
+                    ", duration (?<duration>\\d+) minutes.*?" +
+                    "(?:Chat Summary:\\s+(?<chat>.*?)\r\n\r\n\r\n)?", setOf(RegexOption.MULTILINE, RegexOption.DOT_MATCHES_ALL))
     }
 
     override fun parse(messages: List<Message>): List<Lesson> {
