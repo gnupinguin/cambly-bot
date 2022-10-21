@@ -3,34 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Cambly Bot</title>
-    <script src="https://code.jquery.com/jquery-1.8.3.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.1/js.cookie.min.js"></script>
-    <script src="index.js"></script>
 </head>
 <body>
-<div>
-    Login with Google: <a href="/oauth2/authorization/google">click here</a>
-</div>
-<div>
-    Logged in as: <span id="user"></span>
-    <div>
-        <button id="logoutButton">Logout</button>
-    </div>
-</div>
-
-
-<div>
-    Email messages:
-    <button id="emailButton">Get Emails!</button>
-    <div id="emails"> </div>
-</div>
-
-
 
 <script type="text/javascript">
-    $.get("/api/user", function(data) {
-        $("#user").html(data.name);
-    });
+    window.close()
 </script>
+
 </body>
 </html>

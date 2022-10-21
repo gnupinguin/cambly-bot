@@ -57,8 +57,10 @@ data class Messages(val messages: List<Message>,
                     val nextPageToken: String?,
                     val resultSizeEstimate: Long)
 
-//TODO support after date
-data class MailQuery(val from: String, val subject: String) {
+data class MailQuery(val from: String,
+                     val subject: String,
+                     val before: Date? = null,
+                     val after: Date? = null) {
     override fun toString() = "from:$from${mapSubject()}"
 
     private fun mapSubject() = ifPresent("subject", subject) {s -> "($s)"}

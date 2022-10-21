@@ -15,7 +15,8 @@ import javax.servlet.http.HttpServletResponse
 
 class PostAuthenticationHandler(private val repository: UserRepository,
                                 private val userSessionProvider: UserSessionProvider,
-                                private val clientService: OAuth2AuthorizedClientService, private val bot: BotApp) : AuthenticationSuccessHandler {
+                                private val clientService: OAuth2AuthorizedClientService,
+                                private val bot: BotApp) : AuthenticationSuccessHandler {
 
     override fun onAuthenticationSuccess(request: HttpServletRequest, response: HttpServletResponse, authentication: Authentication) {
         if (isOAuthToken(authentication)) {
@@ -25,6 +26,7 @@ class PostAuthenticationHandler(private val repository: UserRepository,
                 val client: OAuth2AuthorizedClient = clientService.loadAuthorizedClient(oauthToken.authorizedClientRegistrationId, oauthToken.name)
                 repository.putUser(createUser(session, client, oauthToken))
                 bot.successAuthorize(session.chatId)
+                clientService.removeAuthorizedClient(oauthToken.authorizedClientRegistrationId, oauthToken.principal.name)
             }
         }
     }

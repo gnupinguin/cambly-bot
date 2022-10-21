@@ -21,7 +21,7 @@ class InMemoryUserRepository : UserRepository {
     }
 
     override fun putUser(user: User) {
-        users[user.telegramId] = user
+        users[user.telegramChatId] = user
     }
 
 }

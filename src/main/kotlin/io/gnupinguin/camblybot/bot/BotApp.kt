@@ -17,11 +17,16 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import javax.annotation.PostConstruct
 
+interface BotApp {
+    fun successAuthorize(chatId: Long)
+}
+
+
 @Component
-class BotApp(private val configuration: BotConfiguration,
-             private val userRepository: UserRepository,
-             private val userSessionProvider: UserSessionProvider,
-             private val lessonProvider: LessonProvider) {
+class BotAppImpl(private val configuration: BotConfiguration,
+                 private val userRepository: UserRepository,
+                 private val userSessionProvider: UserSessionProvider,
+                 private val lessonProvider: LessonProvider): BotApp {
 
     companion object {
         @JvmStatic
@@ -35,7 +40,7 @@ class BotApp(private val configuration: BotConfiguration,
                 val user = userRepository.getUser(message.chat.id)
                 if (user == null) {
                     val sessionId = userSessionProvider.generate(message.chat.id)
-                    sendHtml("http://127.0.0.1:8080/oauth2/authorization/google?jwt=$sessionId")
+                    sendHtml("Follow by <a href=\"http://127.0.0.1:8080/oauth2/authorization/google?jwt=$sessionId\">link</a> for authorization")
                 }
             }
             command("lastLesson") {
@@ -48,6 +53,9 @@ class BotApp(private val configuration: BotConfiguration,
                     }
                 }
             }
+            command("nextHistoryLesson") {
+
+            }
         }
     }
 
@@ -58,15 +66,15 @@ class BotApp(private val configuration: BotConfiguration,
             lesson.words.joinToString(separator = "\n") { "<b>$it</b>" }
 
     private fun CommandHandlerEnvironment.sendHtml(text: String, responseHandler: (Response<Message>?) -> Unit = {}) {
-        bot.sendMessage(chatId = chatId(), text = text, ParseMode.HTML ).fold(responseHandler) {
+        bot.sendMessage(chatId = chatId(), text = text, ParseMode.HTML).fold(responseHandler) {
             log.info("Exception during sending: {}", it.errorBody?.string(), it.exception)
         }
     }
 
     private fun CommandHandlerEnvironment.chatId() = ChatId.fromId(message.chat.id)
 
-    fun successAuthorize(chatId: Long) {
-        bot.sendMessage(chatId=ChatId.fromId(chatId), text="You are successfully authorized!")
+    override fun successAuthorize(chatId: Long) {
+        bot.sendMessage(chatId = ChatId.fromId(chatId), text = "You are successfully authorized!")
     }
 
     @PostConstruct
